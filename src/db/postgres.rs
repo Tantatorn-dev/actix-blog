@@ -1,15 +1,23 @@
-use tokio_postgres::{Error, NoTls};
+use tokio_postgres::NoTls;
 
-pub async fn connect_to_db() -> Result<tokio_postgres::Client, Error> {
-    println!("Connecting to database");
-    let (client, connection) =
-        tokio_postgres::connect("host=localhost user=lord_t password=password", NoTls).await?;
+pub struct Postgres {
+    pub client: tokio_postgres::Client,
+}
 
-    tokio::spawn(async move {
-        if let Err(e) = connection.await {
-            eprintln!("connection error: {}", e); 
-        }
-    });
+impl Postgres {
+    pub async fn connect_to_db() -> Postgres {
+        println!("Connecting to database");
+        let (client, connection) =
+            tokio_postgres::connect("host=localhost user=lord_t password=password dbname=postgres", NoTls)
+                .await
+                .unwrap();
 
-    Ok(client)
+        tokio::spawn(async move {
+            if let Err(e) = connection.await {
+                eprintln!("connection error: {}", e);
+            }
+        });
+
+        return Postgres { client };
+    }
 }

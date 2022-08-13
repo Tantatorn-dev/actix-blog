@@ -1,14 +1,11 @@
 use actix_web::{get, App, HttpResponse, HttpServer, Responder};
-use db::postgres::connect_to_db;
 
-mod routes;
 mod db;
+mod routes;
 use crate::routes::user::*;
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
-    let _client = connect_to_db().await.unwrap();
-
     HttpServer::new(|| {
         App::new()
             .service(hello)

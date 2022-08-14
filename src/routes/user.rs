@@ -1,11 +1,18 @@
-use actix_web::{get, web, Responder, Result};
-use serde::Serialize;
+use actix_web::{get, web, Responder, Result, post};
+use serde::{Serialize, Deserialize};
 
 use crate::db::postgres::Postgres;
 
-#[derive(Serialize, Clone, Debug)]
-struct User {
+#[derive(Serialize, Deserialize, Clone, Debug)]
+pub struct User {
     id: i32,
+    username: String,
+    password: String,
+}
+
+
+#[derive(Serialize, Deserialize)]
+pub struct NewUser {
     username: String,
     password: String,
 }
@@ -54,4 +61,15 @@ pub async fn get_user_by_id(info: web::Path<i32>) -> Result<impl Responder> {
         .collect::<Vec<User>>().pop();
 
     Ok(web::Json(user))
+}
+
+#[post("/user")]
+pub async fn new_user(info: web::Form<NewUser>) -> Result<impl Responder> {
+    let _pg = Postgres::connect_to_db().await;
+
+    let query_str = format!("INSERT INTO blog_user (username, password) VALUES ('{}', '{}')", info.username, info.password);
+
+    let _ = _pg.client.query(query_str.as_str(), &[]).await.unwrap();
+
+    Ok(web::Json(info))
 }

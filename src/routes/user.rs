@@ -1,21 +1,6 @@
 use actix_web::{get, web, Responder, Result, post};
-use serde::{Serialize, Deserialize};
 
-use crate::db::postgres::Postgres;
-
-#[derive(Serialize, Deserialize, Clone, Debug)]
-pub struct User {
-    id: i32,
-    username: String,
-    password: String,
-}
-
-
-#[derive(Serialize, Deserialize)]
-pub struct NewUser {
-    username: String,
-    password: String,
-}
+use crate::{db::postgres::Postgres, dtos::user::{User, NewUser}};
 
 #[get("/user")]
 pub async fn list_user() -> Result<impl Responder> {
@@ -35,8 +20,6 @@ pub async fn list_user() -> Result<impl Responder> {
             password: row.get(2),
         })
         .collect::<Vec<User>>();
-
-    println!("{:?}", users);
 
     Ok(web::Json(users))
 }

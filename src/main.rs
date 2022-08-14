@@ -2,6 +2,8 @@ use actix_web::{get, App, HttpResponse, HttpServer, Responder};
 
 mod db;
 mod routes;
+mod dtos;
+
 use crate::routes::user::*;
 
 #[actix_web::main]

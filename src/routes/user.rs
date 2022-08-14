@@ -1,7 +1,7 @@
 use actix_web::{get, web, Responder, Result};
-use serde::{Serialize};
+use serde::Serialize;
 
-use crate::db::postgres::{Postgres};
+use crate::db::postgres::Postgres;
 
 #[derive(Serialize, Clone, Debug)]
 struct User {
@@ -28,7 +28,7 @@ pub async fn list_user() -> Result<impl Responder> {
             password: row.get(2),
         })
         .collect::<Vec<User>>();
-    
+
     println!("{:?}", users);
 
     Ok(web::Json(users))
@@ -36,10 +36,22 @@ pub async fn list_user() -> Result<impl Responder> {
 
 #[get("/user/{id}")]
 pub async fn get_user_by_id(info: web::Path<i32>) -> Result<impl Responder> {
-    let user = User {
-        id: info.into_inner(),
-        username: "admin".to_string(),
-        password: "admin".to_string(),
-    };
+    let _pg = Postgres::connect_to_db().await;
+
+    let id = info.into_inner();
+
+    let query_str = format!("SELECT * FROM blog_user WHERE id={}", id);
+
+    let row = _pg.client.query(query_str.as_str(), &[]).await.unwrap();
+
+    let user = row
+        .iter()
+        .map(|row| User {
+            id: row.get(0),
+            username: row.get(1),
+            password: row.get(2),
+        })
+        .collect::<Vec<User>>().pop();
+
     Ok(web::Json(user))
 }

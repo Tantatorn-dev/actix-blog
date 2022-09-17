@@ -1,6 +1,9 @@
-use actix_web::{get, web, Responder, Result, post};
+use actix_web::{get, post, web, Responder, Result};
 
-use crate::{db::postgres::Postgres, dtos::user::{User, NewUser}};
+use crate::{
+    db::postgres::Postgres,
+    dtos::user::{NewUser, User},
+};
 
 #[get("/user")]
 pub async fn list_user() -> Result<impl Responder> {
@@ -41,7 +44,8 @@ pub async fn get_user_by_id(info: web::Path<i32>) -> Result<impl Responder> {
             username: row.get(1),
             password: row.get(2),
         })
-        .collect::<Vec<User>>().pop();
+        .collect::<Vec<User>>()
+        .pop();
 
     Ok(web::Json(user))
 }
@@ -50,9 +54,13 @@ pub async fn get_user_by_id(info: web::Path<i32>) -> Result<impl Responder> {
 pub async fn new_user(info: web::Form<NewUser>) -> Result<impl Responder> {
     let _pg = Postgres::connect_to_db().await;
 
-    let query_str = format!("INSERT INTO blog_user (username, password) VALUES ('{}', '{}')", info.username, info.password);
+    let query_str = format!(
+        "INSERT INTO blog_user (username, password) VALUES ('{}', '{}')",
+        info.username, info.password
+    );
 
-    let _ = _pg.client.query(query_str.as_str(), &[]).await.unwrap();
-
-    Ok(web::Json(info))
+    match _pg.client.query(query_str.as_str(), &[]).await {
+        Ok(_) => Ok(web::Json("User created successfully")),
+        Err(_) => Ok(web::Json("Create user failed")),
+    }
 }

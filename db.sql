@@ -11,3 +11,11 @@ CREATE TABLE public.blog_user (
 	CONSTRAINT accounts_pkey PRIMARY KEY (id),
 	CONSTRAINT accounts_username_key UNIQUE (username)
 );
+
+CREATE TABLE public.blog (
+	id int4 NOT NULL GENERATED ALWAYS AS IDENTITY,
+	blog_user_id int4 NULL,
+	title text NULL,
+	"content" text NULL,
+	CONSTRAINT fk_blog_user FOREIGN KEY (blog_user_id) REFERENCES public.blog_user(id)
+);

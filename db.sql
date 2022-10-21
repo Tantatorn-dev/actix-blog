@@ -19,3 +19,10 @@ CREATE TABLE public.blog (
 	"content" text NULL,
 	CONSTRAINT fk_blog_user FOREIGN KEY (blog_user_id) REFERENCES public.blog_user(id)
 );
+
+CREATE TABLE public.user_session (
+	id int4 NOT NULL GENERATED ALWAYS AS IDENTITY,
+	blog_user_id int4 NULL,
+	"token" text NULL DEFAULT md5(random()::text),
+	CONSTRAINT fk_blog_user FOREIGN KEY (blog_user_id) REFERENCES public.blog_user(id)
+);

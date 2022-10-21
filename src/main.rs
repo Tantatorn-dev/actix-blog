@@ -1,11 +1,12 @@
 use actix_web::{get, App, HttpResponse, HttpServer, Responder};
-use routes::blog::{list_blog, get_blog_by_id, new_blog};
+use routes::{
+    blog::{get_blog_by_id, list_blog, new_blog},
+    user::{get_user_by_id, list_user, new_user}, auth::login,
+};
 
 mod db;
-mod routes;
 mod dtos;
-
-use crate::routes::user::*;
+mod routes;
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
@@ -18,6 +19,7 @@ async fn main() -> std::io::Result<()> {
             .service(list_blog)
             .service(get_blog_by_id)
             .service(new_blog)
+            .service(login)
     })
     .bind(("127.0.0.1", 8080))?
     .run()

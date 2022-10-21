@@ -40,7 +40,7 @@ pub async fn get_blog_by_id(info: web::Path<i32>) -> Result<impl Responder> {
             id: row.get(0),
             blog_user_id: row.get(1),
             title: row.get(2),
-            content: row.get(2),
+            content: row.get(3),
         })
         .collect::<Vec<Blog>>()
         .pop();
